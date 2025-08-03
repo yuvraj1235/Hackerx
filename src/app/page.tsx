@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const embeddings = new GoogleGenerativeAIEmbeddings({
       model: "text-embedding-004",
     });
-    const queryParsingPrompt = ChatPromptTemplate.fromTemplate(
+    const queryParsingPrompt = ChatPromptTemplate.fromTemplate(`
   You are an expert at parsing insurance-related queries. Extract key information from the user's query and return it as JSON.
 
   Query: {query}
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   - other_details: string (any other relevant information)
 
   Return only a JSON object with these fields. Use null for missing information.
-);
+`);
     const parsedQuery = await queryParsingPrompt
         .pipe(llm)
         .pipe(new StringOutputParser())
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
             k:5,  // Number of documents to retrieve
 
                 });
-      const evaluationPrompt = ChatPromptTemplate.fromTemplate(
+      const evaluationPrompt = ChatPromptTemplate.fromTemplate(`
 You are an expert insurance claims evaluator. Based on the provided context from policy documents, evaluate the insurance claim and make a decision.
 
 Original Query: {input}
@@ -85,7 +85,7 @@ Return your response as a valid JSON object in exactly this format:
 }}
 
 Important: Reference specific clauses, sections, or policy terms in your justification. Each justification should include the source like "[Clause 3.2]" or "[Section 5.1]".
-); 
+`); 
 
     const documentChain=await createStuffDocumentsChain({
         llm,
