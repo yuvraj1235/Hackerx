@@ -510,7 +510,7 @@ interface QueryResult {
   Decision: "Approved" | "Rejected";
   Amount: number | null;
   Justification: string[];
-  context?: any[];
+  context?: Array<{ content: string; metadata: Record<string, unknown> }>
 }
 
 export default function Home() {

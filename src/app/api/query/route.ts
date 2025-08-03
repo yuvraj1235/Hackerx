@@ -132,7 +132,7 @@ Important: Reference specific clauses, sections, or policy terms in your justifi
         Decision: parsedResult.Decision || "Rejected",
         Amount: parsedResult.Amount || null,
         Justification: Array.isArray(parsedResult.Justification)? parsedResult.Justification : ["No justification provided"],
-        context:result.context?.map((doc: { pageContent: string; metadata: any }) => ({
+        context:result.context?.map((doc: { pageContent: string; metadata: Record<string, unknown>}) => ({
             content: doc.pageContent.substring(0, 200)+ '...', // Limit to first 200 characters
             metadata: doc.metadata
         })) || []
