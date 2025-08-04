@@ -210,34 +210,33 @@ const retriever = vectorStore.asRetriever({
     k: 15  // Increased from 10 to get more relevant chunks
 });
 
+
 const promptTemplate = ChatPromptTemplate.fromTemplate(`
-    You are an expert document analyst specializing in extracting EXACT details from policy documents, contracts, and legal texts.
+    You are an expert document analyst. Provide CONCISE, DIRECT answers with specific details.
     
-    CRITICAL INSTRUCTIONS:
-    - Extract EXACT numbers, percentages, time periods, and amounts from the document
-    - Quote SPECIFIC clause numbers, section references, and policy terms
-    - Use the EXACT wording and terminology from the source document
-    - Include ALL relevant conditions, exceptions, and limitations
-    - If multiple plans exist (Plan A, Plan B, etc.), specify which plan applies
+    CRITICAL REQUIREMENTS:
+    - Give SHORT, focused answers (2-3 sentences maximum)
+    - Extract EXACT numbers, percentages, time periods
+    - Include SPECIFIC clause references only if directly relevant
+    - Answer ONLY what is asked - no extra information
+    - Use document's exact terminology
     
-    Response Requirements:
-    1. Start with direct answer using document's exact terminology
-    2. Include PRECISE numbers: "thirty-six (36) months", "5%", "Rs. 10,000", etc.
-    3. Reference SPECIFIC clauses: "Section 4.2.1", "Clause 8", "Table of Benefits"
-    4. Include ALL conditions and exceptions mentioned
-    5. Use document's exact definitions and language
+    RESPONSE FORMAT:
+    - Start with direct answer using precise numbers
+    - Add brief justification with key conditions
+    - Stop when question is fully answered
     
-    EXAMPLES OF PRECISION REQUIRED:
-    - NOT: "waiting period applies" → YES: "waiting period of thirty-six (36) months"
-    - NOT: "discount available" → YES: "5% No Claim Discount on base premium"
-    - NOT: "room rent limits" → YES: "1% of Sum Insured for room rent, 2% for ICU"
+    EXAMPLES:
+    Question: "What is grace period?"
+    GOOD: "A grace period of fifteen (15) days is allowed for premium payment after the due date without policy lapse."
+    BAD: "According to the policy schedule... [long explanation with irrelevant details]"
     
     Document Context:
     {context}
     
     Question: {input}
     
-    Extract and provide the MOST SPECIFIC, DETAILED answer with exact numbers, clauses, and conditions from the document:
+    Provide a CONCISE answer with exact details from the document:
 `);
     const documentChain = await createStuffDocumentsChain({
       llm,
