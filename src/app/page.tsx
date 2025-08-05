@@ -302,10 +302,10 @@ import { LuFileJson } from 'react-icons/lu';
 import { BiErrorCircle } from 'react-icons/bi';
 import { MdOutlineDocumentScanner } from 'react-icons/md';
 
-interface HackRxRequest {
-  documents: string;
-  questions: string[];
-}
+// interface HackRxRequest {
+//   documents: string;
+//   questions: string[];
+// }
 
 interface HackRxResponse {
   answers: string[];

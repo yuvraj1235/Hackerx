@@ -1072,6 +1072,14 @@ interface HackRxRequest{
 interface HackRxResponse {
   answers: string[];
 }
+interface RetrievalResult {
+  answer: string;
+}
+
+interface BatchResult {
+  answer: string;
+  originalIndex: number;
+}
 
 const Auth_api_key=process.env.AUTHORIZATION_KEY;
 
@@ -1229,16 +1237,16 @@ const STOP_WORDS = new Set([
 // Optimized parallel question processing
 async function processQuestionBatch(
   questions: string[], 
-  retrievalChain: any, 
+retrievalChain: { invoke: (params: { input: string }) => Promise<RetrievalResult> },  
   batchSize: number = 3
 ): Promise<string[]> {
   const answers: string[] = new Array(questions.length);
   
   for (let i = 0; i < questions.length; i += batchSize) {
     const batch = questions.slice(i, i + batchSize);
-    console.log(`🔄 Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(questions.length / batchSize)}`);
+    console.log(` Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(questions.length / batchSize)}`);
     
-    const batchPromises = batch.map(async (question, batchIndex) => {
+    const batchPromises = batch.map(async (question, batchIndex) :Promise<BatchResult>=> {
       const originalIndex = i + batchIndex;
       try {
         console.log(`Processing question ${originalIndex + 1}: ${question}`);
@@ -1248,11 +1256,12 @@ async function processQuestionBatch(
         
         // Step 2: Primary search with timeout
         const primaryResult = await Promise.race([
-          retrievalChain.invoke({ input: enhancedQuestion }),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), 15000)
-          )
-        ]) as any;
+  retrievalChain.invoke({ input: enhancedQuestion }),
+  new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error('Timeout')), 20000)
+  )
+]);  
+
         
         let answer = primaryResult.answer;
         
@@ -1263,17 +1272,18 @@ async function processQuestionBatch(
           
           try {
             const alternateResult = await Promise.race([
-              retrievalChain.invoke({ input: alternateQuery }),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Alternate timeout')), 10000)
-              )
-            ]) as any;
+  retrievalChain.invoke({ input: alternateQuery }),
+  new Promise<never>((_, reject) => 
+    setTimeout(() => reject(new Error('Alternate timeout')), 10000)
+  )
+]);  
+
             
             if (alternateResult.answer && alternateResult.answer.length > answer.length) {
               answer = alternateResult.answer;
             }
-          } catch (retryError) {
-            console.log(`Retry failed for question: ${question}`);
+          } catch (error) {
+            console.log(`Retry failed for question: ${question}`,error);
           }
         }
         
