@@ -343,7 +343,7 @@ Are the medical expenses for an organ donor covered under this policy?`);
     const questionArray = questions.split('\n').filter(q => q.trim() !== '');
 
     try {
-      const response = await fetch('/api/hackrx/run', {  // Updated endpoint
+      const response = await fetch('/api/v1/hackrx/run', {  // Updated endpoint
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -394,7 +394,7 @@ Are the medical expenses for an organ donor covered under this policy?`);
                 HackRx 6.0 - Document Query System
               </h1>
               <p className="text-gray-400 text-sm mt-1">
-                Endpoint: <code className="bg-gray-800 px-2 py-1 rounded">/api/hackrx/run</code>
+                Endpoint: <code className="bg-gray-800 px-2 py-1 rounded">/api/v1/hackrx/run</code>
               </p>
             </div>
             <div className="hidden sm:block text-right">
