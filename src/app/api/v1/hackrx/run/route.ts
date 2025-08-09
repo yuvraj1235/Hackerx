@@ -95,9 +95,9 @@ class CustomScoreRetriever extends BaseRetriever {
     );
 
     return results
-      .filter(([doc, score]) => score >= this.scoreThreshold)
+      .filter(([_doc, score]) => score >= this.scoreThreshold)
       .slice(0, this.k)
-      .map(([doc, score]) => doc);
+      .map(([doc, _score]) => doc);
   }
 }
 
@@ -152,7 +152,7 @@ function enhanceQuestion(question: string): string {
 }
 
 // Minimal answer quality checker to avoid over-filtering
-function isAnswerIncomplete(answer: string, question: string): boolean {
+function isAnswerIncomplete(answer: string, _question: string): boolean {
   const answerLower = answer.toLowerCase();
 
   // Only check for very obvious incomplete indicators
@@ -171,6 +171,8 @@ function isAnswerIncomplete(answer: string, question: string): boolean {
     answerLower.includes(indicator)
   );
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 // Number-focused alternate query generator
 function generateAlternateQuery(question: string): string {
@@ -310,7 +312,7 @@ async function processQuestionBatch(
                 answer = alternateResult.answer;
               }
             } catch (error) {
-              console.log(`Retry failed for question: ${question}`);
+              console.log(`Retry failed for question: ${question}`, error);
             }
           }
 
